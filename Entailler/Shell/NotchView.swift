@@ -95,10 +95,11 @@ private struct NotchSurface: View {
                     .padding(.horizontal, NookLayout.openFlareRadius + 20)
                 switch view {
                 case .home:
-                    HStack {
+                    HStack(alignment: .top, spacing: 28) {
                         MediaWidgetView(media: state.media, send: sendMediaCommand)
                             .frame(width: 320)
-                        Spacer()
+                        CalendarWidgetView(calendar: state.calendar)
+                            .frame(height: MediaWidgetView.height)
                     }
                     .padding(.horizontal, NookLayout.openFlareRadius + 20)
                     .padding(.top, NookLayout.contentTopPadding)
@@ -180,9 +181,10 @@ private struct ActivityWings: View {
                 .padding(.leading, notchHeight / 3)
         case .nowPlaying:
             NowPlayingArtwork(artwork: track?.artwork, isPlaying: isPlaying, size: notchHeight - 10)
-        // A stand-in until the upcoming-event feature ticket gives it real content.
         case .upcomingEvent:
-            placeholder("calendar")
+            Image(systemName: "calendar")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(.white)
         }
     }
 
@@ -193,19 +195,13 @@ private struct ActivityWings: View {
                 .padding(.horizontal, notchHeight / 3)
         case .nowPlaying:
             Waveform(isPlaying: isPlaying, height: notchHeight * 0.4)
-        case .upcomingEvent:
-            EmptyView()
+        case .upcomingEvent(let event):
+            EventCountdown(start: event.start)
         }
     }
 
     private var track: NowPlaying? { media.nowPlaying }
     private var isPlaying: Bool { track?.isPlaying ?? false }
-
-    private func placeholder(_ symbol: String) -> some View {
-        Image(systemName: symbol)
-            .font(.system(size: 13, weight: .semibold))
-            .foregroundStyle(.white)
-    }
 }
 
 /// The icon of a volume or brightness Flash Activity.

@@ -1,8 +1,12 @@
+import Foundation
 import NotchCore
 
-/// The real clock: runs scheduled actions on the main actor after a real delay.
+/// The real clock: tells the wall-clock time and runs scheduled actions on the main actor after
+/// a real delay.
 @MainActor
 final class SystemClock: NotchClock {
+    var now: Date { Date() }
+
     func schedule(after delay: Duration, _ action: @escaping @MainActor () -> Void) -> any TimerHandle {
         TaskTimer(Task {
             try? await Task.sleep(for: delay)

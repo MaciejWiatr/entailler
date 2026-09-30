@@ -38,7 +38,7 @@ struct ActivitySlotTests {
         for source in order {
             switch source {
             case .flash: harness.changeVolume()
-            case .upcomingEvent: harness.core.activityStarted(.upcomingEvent)
+            case .upcomingEvent: harness.core.activityStarted(.upcomingEvent(.standup))
             case .nowPlaying: harness.core.activityStarted(.nowPlaying)
             }
         }
@@ -49,7 +49,7 @@ struct ActivitySlotTests {
     @Test func anUpcomingEventWinsOverNowPlaying() {
         let harness = Harness()
 
-        harness.core.activityStarted(.upcomingEvent)
+        harness.core.activityStarted(.upcomingEvent(.standup))
         harness.core.activityStarted(.nowPlaying)
 
         #expect(harness.state.activity?.source == .upcomingEvent)
@@ -58,7 +58,7 @@ struct ActivitySlotTests {
     @Test func eachLowerActivityReturnsInTurnAsHigherOnesEnd() {
         let harness = Harness()
         harness.core.activityStarted(.nowPlaying)
-        harness.core.activityStarted(.upcomingEvent)
+        harness.core.activityStarted(.upcomingEvent(.standup))
         harness.changeVolume()
 
         harness.clock.advance(by: .milliseconds(1500))

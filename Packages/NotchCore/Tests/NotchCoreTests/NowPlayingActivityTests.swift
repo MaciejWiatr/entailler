@@ -87,7 +87,7 @@ struct NowPlayingActivityTests {
         let harness = Harness()
         harness.nowPlaying.set(.song)
 
-        harness.core.activityStarted(.upcomingEvent)
+        harness.core.activityStarted(.upcomingEvent(.standup))
         #expect(harness.state.activity?.source == .upcomingEvent)
 
         harness.core.activityEnded(.upcomingEvent)

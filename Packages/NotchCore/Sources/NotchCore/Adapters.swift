@@ -1,3 +1,5 @@
+import Foundation
+
 /// Where the Notch sits on the built-in display, in global screen coordinates
 /// with the origin at the bottom left, as AppKit uses.
 public struct NotchPlacement: Equatable, Sendable {
@@ -48,4 +50,14 @@ public protocol NowPlayingSource: AnyObject {
 @MainActor
 public protocol MediaController: AnyObject {
     func send(_ command: MediaCommand)
+}
+
+/// Reads events from all of the user's calendars.
+@MainActor
+public protocol CalendarSource: AnyObject {
+    /// Asks for calendar access if it hasn't been asked for before, then reports whether it's granted.
+    /// Reports again whenever events or access change, or the clock jumps, so the core looks again.
+    func start(_ update: @escaping @MainActor (CalendarAccess) -> Void)
+    /// Events from all calendars that overlap `interval`. Empty without access.
+    func events(in interval: DateInterval) -> [CalendarEvent]
 }

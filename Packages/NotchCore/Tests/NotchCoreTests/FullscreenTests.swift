@@ -3,7 +3,7 @@ import Testing
 
 @MainActor
 struct FullscreenTests {
-    @Test(arguments: [Activity.nowPlaying, .upcomingEvent])
+    @Test(arguments: [Activity.nowPlaying, .upcomingEvent(.standup)])
     func inFullscreenAnOngoingActivityIsNotShown(activity: Activity) {
         let harness = Harness()
         harness.fullscreen.set(true)

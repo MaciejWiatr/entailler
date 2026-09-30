@@ -4,6 +4,7 @@ public struct NotchDisplayState: Equatable, Sendable {
     public var nook: Nook = .closed
     public var activity: Activity?
     public var media: MediaWidget = .empty
+    public var calendar: CalendarWidget = .agenda(.empty)
 }
 
 public enum NotchVisibility: Equatable, Sendable {

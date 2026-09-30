@@ -20,11 +20,14 @@ public final class NotchCore {
     private let levelChangeSource: any LevelChangeSource
     private let nowPlayingSource: any NowPlayingSource
     private let mediaController: any MediaController
+    private let calendarSource: any CalendarSource
     @ObservationIgnored private var hoverTimer: (any TimerHandle)?
     @ObservationIgnored private var flashTimer: (any TimerHandle)?
     @ObservationIgnored private var pausedTimer: (any TimerHandle)?
+    @ObservationIgnored private var calendarTimer: (any TimerHandle)?
     @ObservationIgnored private var activities: [ActivitySource: Activity] = [:]
     @ObservationIgnored private var isFullscreen = false
+    @ObservationIgnored private var calendarAccess = CalendarAccess.denied
 
     public init(
         clock: any NotchClock,
@@ -32,7 +35,8 @@ public final class NotchCore {
         fullscreenDetector: any FullscreenDetector,
         levelChangeSource: any LevelChangeSource,
         nowPlayingSource: any NowPlayingSource,
-        mediaController: any MediaController
+        mediaController: any MediaController,
+        calendarSource: any CalendarSource
     ) {
         self.clock = clock
         self.displayLocator = displayLocator
@@ -40,10 +44,12 @@ public final class NotchCore {
         self.levelChangeSource = levelChangeSource
         self.nowPlayingSource = nowPlayingSource
         self.mediaController = mediaController
+        self.calendarSource = calendarSource
         displayLocator.start { [weak self] placement in self?.displayChanged(placement) }
         fullscreenDetector.start { [weak self] isFullscreen in self?.fullscreenChanged(isFullscreen) }
         levelChangeSource.start { [weak self] change in self?.levelChanged(change) }
         nowPlayingSource.start { [weak self] nowPlaying in self?.nowPlayingChanged(nowPlaying) }
+        calendarSource.start { [weak self] access in self?.calendarChanged(access) }
     }
 
     public func pointerEntered() {
@@ -143,6 +149,37 @@ public final class NotchCore {
     private func cancelPausedTimer() {
         pausedTimer?.cancel()
         pausedTimer = nil
+    }
+
+    private func calendarChanged(_ access: CalendarAccess) {
+        calendarAccess = access
+        refreshCalendar()
+    }
+
+    /// Reads today's and tomorrow's events again, and schedules the next read for when what
+    /// they show next changes with time.
+    private func refreshCalendar() {
+        calendarTimer?.cancel()
+        calendarTimer = nil
+        guard calendarAccess == .granted else {
+            state.calendar = .accessDenied
+            activityEnded(.upcomingEvent)
+            return
+        }
+        let now = clock.now
+        let days = CalendarDays(at: now)
+        let events = calendarSource.events(in: days.interval)
+        state.calendar = .agenda(days.agenda(of: events))
+        if let upcoming = days.upcomingEvent(in: events) {
+            activityStarted(.upcomingEvent(upcoming))
+        } else {
+            activityEnded(.upcomingEvent)
+        }
+        let untilNextChange = days.nextChange(in: events).timeIntervalSince(now)
+        calendarTimer = clock.schedule(after: .seconds(untilNextChange)) { [weak self] in
+            self?.calendarTimer = nil
+            self?.refreshCalendar()
+        }
     }
 
     private func fullscreenChanged(_ isFullscreen: Bool) {

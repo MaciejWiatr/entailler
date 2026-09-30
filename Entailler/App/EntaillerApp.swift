@@ -25,7 +25,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             fullscreenDetector: FrontAppFullscreenDetector(),
             levelChangeSource: MediaKeyLevelSource(),
             nowPlayingSource: nowPlaying,
-            mediaController: nowPlaying
+            mediaController: nowPlaying,
+            calendarSource: EventKitCalendar()
         )
         notchWindow = NotchWindowController(core: core)
     }

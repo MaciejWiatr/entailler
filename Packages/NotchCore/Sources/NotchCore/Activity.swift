@@ -15,7 +15,8 @@ public enum ActivityKind: Sendable {
 public enum Activity: Equatable, Sendable {
     /// A Flash Activity showing the level the user just changed.
     case flash(LevelChange)
-    case upcomingEvent
+    /// An Ongoing Activity counting down to an event that starts within 5 minutes.
+    case upcomingEvent(CalendarEvent)
     case nowPlaying
 
     public var source: ActivitySource {
