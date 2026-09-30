@@ -48,12 +48,12 @@ private struct NotchSurface: View {
         .clipShape(shape)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .animation(nookAnimation, value: state.nook)
-        .animation(.spring(duration: 0.25, bounce: 0.2), value: state.activity)
+        .animation(.spring(duration: 0.3, bounce: 0.2), value: state.activity)
     }
 
     /// Opening springs out of the camera cutout; closing tucks back in without overshoot.
     private var nookAnimation: Animation {
-        isOpen ? .spring(duration: 0.3, bounce: 0.3) : .spring(duration: 0.2, bounce: 0)
+        isOpen ? .spring(duration: 0.38, bounce: 0.3) : .spring(duration: 0.25, bounce: 0)
     }
 
     @ViewBuilder private var content: some View {
