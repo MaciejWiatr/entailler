@@ -1,0 +1,42 @@
+name: Entailler
+options:
+  bundleIdPrefix: com.maciejwiatr
+  deploymentTarget:
+    macOS: "26.0"
+  createIntermediateGroups: true
+packages:
+  NotchCore:
+    path: Packages/NotchCore
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+targets:
+  Entailler:
+    type: application
+    platform: macOS
+    sources: [Entailler]
+    dependencies:
+      - package: NotchCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.maciejwiatr.entailler
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_LSUIElement: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Entailler
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.utilities
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: "-"
+        ENABLE_HARDENED_RUNTIME: NO
+schemes:
+  Entailler:
+    build:
+      targets:
+        Entailler: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - package: NotchCore/NotchCoreTests
