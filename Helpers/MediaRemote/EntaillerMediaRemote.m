@@ -46,6 +46,13 @@ static id jsonValue(id value) {
     return value ?: [NSNull null];
 }
 
+/// `value` if it's a finite number. Some sources report an infinite duration or position, as for
+/// a live stream, and JSON can't carry those.
+static NSNumber *finiteNumber(id value) {
+    if (![value isKindOfClass:[NSNumber class]] || !isfinite([value doubleValue])) return nil;
+    return value;
+}
+
 static void scheduleReport(NSUInteger delayMilliseconds);
 
 static void writeNowPlaying(NSDictionary *info, BOOL playing, NSString *app) {
@@ -57,11 +64,12 @@ static void writeNowPlaying(NSDictionary *info, BOOL playing, NSString *app) {
         @"artist": info[@"kMRMediaRemoteNowPlayingInfoArtist"] ?: @"",
         @"album": info[@"kMRMediaRemoteNowPlayingInfoAlbum"] ?: @"",
         @"artwork": jsonValue([artwork base64EncodedStringWithOptions:0]),
-        @"duration": jsonValue(info[@"kMRMediaRemoteNowPlayingInfoDuration"]),
-        @"elapsed": info[@"kMRMediaRemoteNowPlayingInfoElapsedTime"] ?: @0,
+        @"duration": jsonValue(finiteNumber(info[@"kMRMediaRemoteNowPlayingInfoDuration"])),
+        @"elapsed": finiteNumber(info[@"kMRMediaRemoteNowPlayingInfoElapsedTime"]) ?: @0,
         @"timestamp": @(timestamp.timeIntervalSince1970),
         @"playing": @(playing),
     };
+    if (![NSJSONSerialization isValidJSONObject:nowPlaying]) return;
     NSData *json = [NSJSONSerialization dataWithJSONObject:nowPlaying options:0 error:nil];
     if (json) writeLine([[NSString alloc] initWithData:json encoding:NSUTF8StringEncoding]);
     // Some apps, like Spotify, briefly publish a sparser version of the track without
