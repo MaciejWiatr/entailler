@@ -3,6 +3,9 @@ import SwiftUI
 
 enum NookLayout {
     static let size = CGSize(width: 640, height: 180)
+    /// How close the pointer has to come to the collapsed Notch to count as resting on it:
+    /// this far out on each side, and this far below it.
+    static let hoverProximity = CGSize(width: 24, height: 16)
     /// Spare room around the Nook, per side, for the opening spring to overshoot into.
     static let springOvershoot = CGSize(width: 40, height: 40)
     /// Radius of the inverted arches flaring the open Nook's top corners into the screen edge.

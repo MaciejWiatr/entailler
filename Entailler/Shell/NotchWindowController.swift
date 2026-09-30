@@ -70,13 +70,16 @@ final class NotchWindowController {
         }
     }
 
-    /// The area the pointer has to be in: the Notch (with any Activity) while collapsed,
+    /// The area the pointer has to be in: close to the Notch (with any Activity) while collapsed,
     /// the whole Nook while open.
     private var hotArea: NSRect? {
         guard case .present(let placement) = core.state.visibility else { return nil }
-        let size = core.state.nook == .closed
-            ? NookLayout.closedSize(around: placement, showingActivity: core.state.activity != nil)
-            : NookLayout.size
+        var size = NookLayout.size
+        if core.state.nook == .closed {
+            let proximity = NookLayout.hoverProximity
+            let notch = NookLayout.closedSize(around: placement, showingActivity: core.state.activity != nil)
+            size = CGSize(width: notch.width + proximity.width * 2, height: notch.height + proximity.height)
+        }
         let area = Self.frame(of: size, around: placement)
         // The pointer can rest on the very top pixel row, which `contains` treats as outside.
         return NSRect(x: area.minX, y: area.minY, width: area.width, height: area.height + 1)

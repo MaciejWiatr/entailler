@@ -4,7 +4,7 @@
 
 **Blocked by:** None — can start immediately
 
-**Status:** ready-for-agent
+**Status:** done
 
 - [x] The Xcode project is generated from an XcodeGen spec, targets macOS 26+, and builds a menu-bar-only app with no Dock icon
 - [x] The menu bar menu offers Launch at login (via the system login-item service) and Quit
