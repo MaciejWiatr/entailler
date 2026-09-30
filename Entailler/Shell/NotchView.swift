@@ -5,6 +5,8 @@ enum NookLayout {
     static let size = CGSize(width: 640, height: 180)
     /// Spare room around the Nook, per side, for the opening spring to overshoot into.
     static let springOvershoot = CGSize(width: 40, height: 40)
+    /// Radius of the inverted arches flaring the open Nook's top corners into the screen edge.
+    static let openFlareRadius: CGFloat = 14
     static let openCornerRadius: CGFloat = 24
     static let closedCornerRadius: CGFloat = 10
 
@@ -34,7 +36,9 @@ private struct NotchSurface: View {
     private var notchHeight: CGFloat { placement.height }
 
     var body: some View {
-        let shape = UnevenRoundedRectangle(bottomLeadingRadius: cornerRadius, bottomTrailingRadius: cornerRadius)
+        let shape = isOpen
+            ? NotchShape(topCornerRadius: NookLayout.openFlareRadius, bottomCornerRadius: NookLayout.openCornerRadius)
+            : NotchShape(topCornerRadius: 0, bottomCornerRadius: NookLayout.closedCornerRadius)
         ZStack(alignment: .top) {
             shape.fill(.black)
             content
@@ -49,7 +53,7 @@ private struct NotchSurface: View {
 
     /// Opening springs out of the camera cutout; closing tucks back in without overshoot.
     private var nookAnimation: Animation {
-        state.nook == .closed ? .spring(duration: 0.3, bounce: 0) : .spring(duration: 0.45, bounce: 0.3)
+        isOpen ? .spring(duration: 0.45, bounce: 0.3) : .spring(duration: 0.3, bounce: 0)
     }
 
     @ViewBuilder private var content: some View {
@@ -63,7 +67,7 @@ private struct NotchSurface: View {
                 ViewSwitcher(selected: view, switchNook: switchNook)
                     .frame(height: notchHeight)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 20)
+                    .padding(.horizontal, NookLayout.openFlareRadius + 20)
                 Spacer()
             }
             .transition(.opacity)
@@ -79,8 +83,8 @@ private struct NotchSurface: View {
         }
     }
 
-    private var cornerRadius: CGFloat {
-        state.nook == .closed ? NookLayout.closedCornerRadius : NookLayout.openCornerRadius
+    private var isOpen: Bool {
+        state.nook != .closed
     }
 }
 
