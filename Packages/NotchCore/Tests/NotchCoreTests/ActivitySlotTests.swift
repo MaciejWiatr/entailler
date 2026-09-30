@@ -9,10 +9,10 @@ struct ActivitySlotTests {
         #expect(harness.state.activity == nil)
     }
 
-    @Test func aFlashActivityIsShownAsAFlashActivity() {
+    @Test func aVolumeChangeIsShownAsAFlashActivity() {
         let harness = Harness()
 
-        harness.core.activityStarted(Activity(source: .flash))
+        harness.changeVolume()
 
         #expect(harness.state.activity?.source == .flash)
         #expect(harness.state.activity?.kind == .flash)
@@ -21,7 +21,7 @@ struct ActivitySlotTests {
     @Test func nowPlayingIsShownAsAnOngoingActivity() {
         let harness = Harness()
 
-        harness.core.activityStarted(Activity(source: .nowPlaying))
+        harness.core.activityStarted(.nowPlaying)
 
         #expect(harness.state.activity?.source == .nowPlaying)
         #expect(harness.state.activity?.kind == .ongoing)
@@ -36,7 +36,11 @@ struct ActivitySlotTests {
         let harness = Harness()
 
         for source in order {
-            harness.core.activityStarted(Activity(source: source))
+            switch source {
+            case .flash: harness.changeVolume()
+            case .upcomingEvent: harness.core.activityStarted(.upcomingEvent)
+            case .nowPlaying: harness.core.activityStarted(.nowPlaying)
+            }
         }
 
         #expect(harness.state.activity?.source == .flash)
@@ -45,29 +49,19 @@ struct ActivitySlotTests {
     @Test func anUpcomingEventWinsOverNowPlaying() {
         let harness = Harness()
 
-        harness.core.activityStarted(Activity(source: .upcomingEvent))
-        harness.core.activityStarted(Activity(source: .nowPlaying))
+        harness.core.activityStarted(.upcomingEvent)
+        harness.core.activityStarted(.nowPlaying)
 
         #expect(harness.state.activity?.source == .upcomingEvent)
     }
 
-    @Test func nowPlayingReturnsWhenAFlashActivityEnds() {
-        let harness = Harness()
-        harness.core.activityStarted(Activity(source: .nowPlaying))
-        harness.core.activityStarted(Activity(source: .flash))
-
-        harness.core.activityEnded(.flash)
-
-        #expect(harness.state.activity?.source == .nowPlaying)
-    }
-
     @Test func eachLowerActivityReturnsInTurnAsHigherOnesEnd() {
         let harness = Harness()
-        harness.core.activityStarted(Activity(source: .nowPlaying))
-        harness.core.activityStarted(Activity(source: .upcomingEvent))
-        harness.core.activityStarted(Activity(source: .flash))
+        harness.core.activityStarted(.nowPlaying)
+        harness.core.activityStarted(.upcomingEvent)
+        harness.changeVolume()
 
-        harness.core.activityEnded(.flash)
+        harness.clock.advance(by: .milliseconds(1500))
         #expect(harness.state.activity?.source == .upcomingEvent)
 
         harness.core.activityEnded(.upcomingEvent)
@@ -79,12 +73,11 @@ struct ActivitySlotTests {
 
     @Test func endingALowerActivityLeavesTheHigherOneShown() {
         let harness = Harness()
-        harness.core.activityStarted(Activity(source: .nowPlaying))
-        harness.core.activityStarted(Activity(source: .flash))
+        harness.core.activityStarted(.nowPlaying)
+        harness.changeVolume()
 
         harness.core.activityEnded(.nowPlaying)
-        harness.core.activityEnded(.flash)
 
-        #expect(harness.state.activity == nil)
+        #expect(harness.state.activity?.source == .flash)
     }
 }

@@ -73,6 +73,19 @@ final class FakeFullscreenDetector: FullscreenDetector {
     }
 }
 
+@MainActor
+final class FakeLevelChangeSource: LevelChangeSource {
+    private var update: (@MainActor (LevelChange) -> Void)?
+
+    func start(_ update: @escaping @MainActor (LevelChange) -> Void) {
+        self.update = update
+    }
+
+    func send(_ change: LevelChange) {
+        update?(change)
+    }
+}
+
 extension NotchPlacement {
     static let macBookPro = NotchPlacement(x: 1545, y: 1085, width: 185, height: 32)
 }
@@ -83,11 +96,17 @@ struct Harness {
     let clock = FakeClock()
     let display: FakeDisplayLocator
     let fullscreen = FakeFullscreenDetector()
+    let levels = FakeLevelChangeSource()
     let core: NotchCore
 
     init(placement: NotchPlacement? = .macBookPro) {
         display = FakeDisplayLocator(placement: placement)
-        core = NotchCore(clock: clock, displayLocator: display, fullscreenDetector: fullscreen)
+        core = NotchCore(
+            clock: clock,
+            displayLocator: display,
+            fullscreenDetector: fullscreen,
+            levelChangeSource: levels
+        )
     }
 
     var state: NotchDisplayState { core.state }
@@ -95,5 +114,12 @@ struct Harness {
     func hover(for duration: Duration) {
         core.pointerEntered()
         clock.advance(by: duration)
+    }
+}
+
+extension Harness {
+    /// Turns the volume to an arbitrary unmuted level.
+    func changeVolume() {
+        levels.send(.volume(level: 0.5, isMuted: false))
     }
 }

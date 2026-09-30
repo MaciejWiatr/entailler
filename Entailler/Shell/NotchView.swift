@@ -14,9 +14,17 @@ enum NookLayout {
     static let closedCornerRadius: CGFloat = 10
 
     /// The collapsed Notch. An Activity widens it with a wing on each side of the camera.
-    static func closedSize(around placement: NotchPlacement, showingActivity: Bool) -> CGSize {
-        let wings = showingActivity ? placement.height * 2 : 0
-        return CGSize(width: placement.width + wings, height: placement.height)
+    static func closedSize(around placement: NotchPlacement, activity: Activity?) -> CGSize {
+        CGSize(width: placement.width + wingWidth(for: activity, around: placement) * 2, height: placement.height)
+    }
+
+    /// A Flash Activity's wings are wider, to fit a level bar beside the camera.
+    static func wingWidth(for activity: Activity?, around placement: NotchPlacement) -> CGFloat {
+        switch activity?.kind {
+        case nil: 0
+        case .flash: placement.height * 2
+        case .ongoing: placement.height
+        }
     }
 }
 
@@ -82,7 +90,7 @@ private struct NotchSurface: View {
         case .open:
             NookLayout.size
         case .closed:
-            NookLayout.closedSize(around: placement, showingActivity: state.activity != nil)
+            NookLayout.closedSize(around: placement, activity: state.activity)
         }
     }
 
@@ -118,30 +126,97 @@ private struct ViewSwitcher: View {
     }
 }
 
-/// Stand-in Activity drawing until each Activity's feature ticket gives it real content.
+/// An Activity's content, split into a wing on each side of the camera.
 private struct ActivityWings: View {
     let activity: Activity
     let placement: NotchPlacement
 
     private var notchHeight: CGFloat { placement.height }
+    private var wingWidth: CGFloat { NookLayout.wingWidth(for: activity, around: placement) }
 
     var body: some View {
         HStack(spacing: 0) {
-            Image(systemName: symbol)
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(.white)
-                .frame(width: notchHeight, height: notchHeight)
+            leading.frame(width: wingWidth, height: notchHeight)
             Spacer(minLength: placement.width)
-            Color.clear.frame(width: notchHeight, height: notchHeight)
+            trailing.frame(width: wingWidth, height: notchHeight)
         }
         .transition(.opacity)
     }
 
-    private var symbol: String {
-        switch activity.source {
-        case .flash: "speaker.wave.2.fill"
-        case .upcomingEvent: "calendar"
-        case .nowPlaying: "music.note"
+    @ViewBuilder private var leading: some View {
+        switch activity {
+        case .flash(let change):
+            // Inset from the Notch's edge by as much as the level bar on the other side.
+            FlashSymbol(change: change)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.leading, notchHeight / 3)
+        // Stand-ins until each Ongoing Activity's feature ticket gives it real content.
+        case .upcomingEvent:
+            placeholder("calendar")
+        case .nowPlaying:
+            placeholder("music.note")
         }
+    }
+
+    @ViewBuilder private var trailing: some View {
+        if case .flash(let change) = activity {
+            LevelBar(change: change)
+                .padding(.horizontal, notchHeight / 3)
+        }
+    }
+
+    private func placeholder(_ symbol: String) -> some View {
+        Image(systemName: symbol)
+            .font(.system(size: 13, weight: .semibold))
+            .foregroundStyle(.white)
+    }
+}
+
+/// The icon of a volume or brightness Flash Activity.
+private struct FlashSymbol: View {
+    let change: LevelChange
+
+    var body: some View {
+        symbol
+            .font(.system(size: 13, weight: .semibold))
+            .foregroundStyle(.white)
+            .contentTransition(.symbolEffect(.replace))
+    }
+
+    private var symbol: Image {
+        switch change {
+        case .volume(_, isMuted: true):
+            Image(systemName: "speaker.slash.fill")
+        case .volume(let level, isMuted: false):
+            // The waves fill in as the volume rises.
+            Image(systemName: "speaker.wave.3.fill", variableValue: level)
+        case .brightness(let level):
+            Image(systemName: level < 0.5 ? "sun.min.fill" : "sun.max.fill")
+        }
+    }
+}
+
+/// The level of a volume or brightness Flash Activity. Muted volume shows an empty bar.
+private struct LevelBar: View {
+    let change: LevelChange
+
+    private var fraction: CGFloat {
+        switch change {
+        case .volume(_, isMuted: true): 0
+        case .volume(let level, isMuted: false), .brightness(let level): level
+        }
+    }
+
+    var body: some View {
+        Capsule()
+            .fill(.white.opacity(0.2))
+            .overlay(alignment: .leading) {
+                GeometryReader { proxy in
+                    Capsule()
+                        .fill(.white)
+                        .frame(width: proxy.size.width * fraction)
+                }
+            }
+            .frame(height: 5)
     }
 }

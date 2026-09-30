@@ -21,7 +21,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let core = NotchCore(
             clock: SystemClock(),
             displayLocator: BuiltInDisplayLocator(),
-            fullscreenDetector: FrontAppFullscreenDetector()
+            fullscreenDetector: FrontAppFullscreenDetector(),
+            levelChangeSource: MediaKeyLevelSource()
         )
         notchWindow = NotchWindowController(core: core)
     }

@@ -28,3 +28,10 @@ public protocol FullscreenDetector: AnyObject {
     /// Reports the current value right away, then again whenever it changes.
     func start(_ update: @escaping @MainActor (Bool) -> Void)
 }
+
+/// Reports each change the user makes to the volume or display brightness. While it runs, the
+/// system's own volume and brightness pop-ups stay hidden, since the Flash Activity replaces them.
+@MainActor
+public protocol LevelChangeSource: AnyObject {
+    func start(_ update: @escaping @MainActor (LevelChange) -> Void)
+}

@@ -77,7 +77,7 @@ final class NotchWindowController {
         var size = NookLayout.size
         if core.state.nook == .closed {
             let proximity = NookLayout.hoverProximity
-            let notch = NookLayout.closedSize(around: placement, showingActivity: core.state.activity != nil)
+            let notch = NookLayout.closedSize(around: placement, activity: core.state.activity)
             size = CGSize(width: notch.width + proximity.width * 2, height: notch.height + proximity.height)
         }
         let area = Self.frame(of: size, around: placement)

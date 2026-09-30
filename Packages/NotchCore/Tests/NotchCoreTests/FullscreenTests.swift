@@ -3,12 +3,12 @@ import Testing
 
 @MainActor
 struct FullscreenTests {
-    @Test(arguments: [ActivitySource.nowPlaying, .upcomingEvent])
-    func inFullscreenAnOngoingActivityIsNotShown(source: ActivitySource) {
+    @Test(arguments: [Activity.nowPlaying, .upcomingEvent])
+    func inFullscreenAnOngoingActivityIsNotShown(activity: Activity) {
         let harness = Harness()
         harness.fullscreen.set(true)
 
-        harness.core.activityStarted(Activity(source: source))
+        harness.core.activityStarted(activity)
 
         #expect(harness.state.activity == nil)
     }
@@ -16,16 +16,16 @@ struct FullscreenTests {
     @Test func inFullscreenAPlayingTrackShowsNoActivityButAVolumeChangeDoes() {
         let harness = Harness()
         harness.fullscreen.set(true)
-        harness.core.activityStarted(Activity(source: .nowPlaying))
+        harness.core.activityStarted(.nowPlaying)
 
-        harness.core.activityStarted(Activity(source: .flash))
+        harness.changeVolume()
 
         #expect(harness.state.activity?.source == .flash)
     }
 
     @Test func goingFullscreenHidesTheOngoingActivityAndLeavingBringsItBack() {
         let harness = Harness()
-        harness.core.activityStarted(Activity(source: .nowPlaying))
+        harness.core.activityStarted(.nowPlaying)
 
         harness.fullscreen.set(true)
         #expect(harness.state.activity == nil)
@@ -37,10 +37,10 @@ struct FullscreenTests {
     @Test func inFullscreenAFlashActivityEndingLeavesNothingShown() {
         let harness = Harness()
         harness.fullscreen.set(true)
-        harness.core.activityStarted(Activity(source: .nowPlaying))
-        harness.core.activityStarted(Activity(source: .flash))
+        harness.core.activityStarted(.nowPlaying)
+        harness.changeVolume()
 
-        harness.core.activityEnded(.flash)
+        harness.clock.advance(by: .milliseconds(1500))
 
         #expect(harness.state.activity == nil)
     }

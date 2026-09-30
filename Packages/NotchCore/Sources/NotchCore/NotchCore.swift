@@ -8,20 +8,30 @@ public final class NotchCore {
     public private(set) var state = NotchDisplayState()
 
     static let hoverDelay: Duration = .milliseconds(150)
+    static let flashDuration: Duration = .milliseconds(1500)
 
     private let clock: any NotchClock
     private let displayLocator: any DisplayLocator
     private let fullscreenDetector: any FullscreenDetector
+    private let levelChangeSource: any LevelChangeSource
     @ObservationIgnored private var hoverTimer: (any TimerHandle)?
+    @ObservationIgnored private var flashTimer: (any TimerHandle)?
     @ObservationIgnored private var activities: [ActivitySource: Activity] = [:]
     @ObservationIgnored private var isFullscreen = false
 
-    public init(clock: any NotchClock, displayLocator: any DisplayLocator, fullscreenDetector: any FullscreenDetector) {
+    public init(
+        clock: any NotchClock,
+        displayLocator: any DisplayLocator,
+        fullscreenDetector: any FullscreenDetector,
+        levelChangeSource: any LevelChangeSource
+    ) {
         self.clock = clock
         self.displayLocator = displayLocator
         self.fullscreenDetector = fullscreenDetector
+        self.levelChangeSource = levelChangeSource
         displayLocator.start { [weak self] placement in self?.displayChanged(placement) }
         fullscreenDetector.start { [weak self] isFullscreen in self?.fullscreenChanged(isFullscreen) }
+        levelChangeSource.start { [weak self] change in self?.levelChanged(change) }
     }
 
     public func pointerEntered() {
@@ -58,6 +68,17 @@ public final class NotchCore {
             return
         }
         state.visibility = .present(placement)
+    }
+
+    private func levelChanged(_ change: LevelChange) {
+        activities[.flash] = .flash(change)
+        refreshActivity()
+        // Each change restarts the countdown, so repeated key presses keep the Flash Activity up.
+        flashTimer?.cancel()
+        flashTimer = clock.schedule(after: Self.flashDuration) { [weak self] in
+            self?.flashTimer = nil
+            self?.activityEnded(.flash)
+        }
     }
 
     private func fullscreenChanged(_ isFullscreen: Bool) {
