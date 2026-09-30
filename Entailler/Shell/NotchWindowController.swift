@@ -74,7 +74,7 @@ final class NotchWindowController {
     /// the whole Nook while open.
     private var hotArea: NSRect? {
         guard case .present(let placement) = core.state.visibility else { return nil }
-        var size = NookLayout.size
+        var size = NookLayout.size(around: placement)
         if core.state.nook == .closed {
             let proximity = NookLayout.hoverProximity
             let notch = NookLayout.closedSize(around: placement, activity: core.state.activity)
@@ -88,10 +88,8 @@ final class NotchWindowController {
     /// The window: the Nook plus room for the opening spring to overshoot without being cut off.
     private static func windowFrame(around placement: NotchPlacement) -> NSRect {
         let overshoot = NookLayout.springOvershoot
-        let size = CGSize(
-            width: NookLayout.size.width + overshoot.width * 2,
-            height: NookLayout.size.height + overshoot.height
-        )
+        let nook = NookLayout.size(around: placement)
+        let size = CGSize(width: nook.width + overshoot.width * 2, height: nook.height + overshoot.height)
         return frame(of: size, around: placement)
     }
 

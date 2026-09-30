@@ -18,11 +18,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var notchWindow: NotchWindowController?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        let nowPlaying = MediaRemoteNowPlaying()
         let core = NotchCore(
             clock: SystemClock(),
             displayLocator: BuiltInDisplayLocator(),
             fullscreenDetector: FrontAppFullscreenDetector(),
-            levelChangeSource: MediaKeyLevelSource()
+            levelChangeSource: MediaKeyLevelSource(),
+            nowPlayingSource: nowPlaying,
+            mediaController: nowPlaying
         )
         notchWindow = NotchWindowController(core: core)
     }

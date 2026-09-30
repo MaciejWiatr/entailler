@@ -3,6 +3,7 @@ public struct NotchDisplayState: Equatable, Sendable {
     public var visibility: NotchVisibility = .absent
     public var nook: Nook = .closed
     public var activity: Activity?
+    public var media: MediaWidget = .empty
 }
 
 public enum NotchVisibility: Equatable, Sendable {

@@ -19,6 +19,13 @@ targets:
     sources: [Entailler]
     dependencies:
       - package: NotchCore
+      # Loaded by /usr/bin/perl rather than by the app, so it is only embedded.
+      - target: EntaillerMediaRemote
+        link: false
+        embed: true
+        codeSign: true
+        copy:
+          destination: frameworks
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.maciejwiatr.entailler
@@ -32,6 +39,18 @@ targets:
         CODE_SIGN_IDENTITY: Apple Development
         DEVELOPMENT_TEAM: ZT5YR566L2
         ENABLE_HARDENED_RUNTIME: NO
+  EntaillerMediaRemote:
+    type: library.dynamic
+    platform: macOS
+    sources: [Helpers/MediaRemote]
+    settings:
+      base:
+        CLANG_ENABLE_OBJC_ARC: YES
+        # Signed like the app it's embedded in.
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: Apple Development
+        DEVELOPMENT_TEAM: ZT5YR566L2
+        SKIP_INSTALL: YES
 schemes:
   Entailler:
     build:

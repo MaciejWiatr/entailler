@@ -1,3 +1,4 @@
+import Foundation
 import NotchCore
 
 /// A clock that only moves when a test calls `advance(by:)`.
@@ -86,6 +87,31 @@ final class FakeLevelChangeSource: LevelChangeSource {
     }
 }
 
+@MainActor
+final class FakeNowPlayingSource: NowPlayingSource {
+    private var update: (@MainActor (NowPlaying?) -> Void)?
+    private var nowPlaying: NowPlaying?
+
+    func start(_ update: @escaping @MainActor (NowPlaying?) -> Void) {
+        self.update = update
+        update(nowPlaying)
+    }
+
+    func set(_ nowPlaying: NowPlaying?) {
+        self.nowPlaying = nowPlaying
+        update?(nowPlaying)
+    }
+}
+
+@MainActor
+final class FakeMediaController: MediaController {
+    private(set) var sent: [MediaCommand] = []
+
+    func send(_ command: MediaCommand) {
+        sent.append(command)
+    }
+}
+
 extension NotchPlacement {
     static let macBookPro = NotchPlacement(x: 1545, y: 1085, width: 185, height: 32)
 }
@@ -97,6 +123,8 @@ struct Harness {
     let display: FakeDisplayLocator
     let fullscreen = FakeFullscreenDetector()
     let levels = FakeLevelChangeSource()
+    let nowPlaying = FakeNowPlayingSource()
+    let mediaController = FakeMediaController()
     let core: NotchCore
 
     init(placement: NotchPlacement? = .macBookPro) {
@@ -105,7 +133,9 @@ struct Harness {
             clock: clock,
             displayLocator: display,
             fullscreenDetector: fullscreen,
-            levelChangeSource: levels
+            levelChangeSource: levels,
+            nowPlayingSource: nowPlaying,
+            mediaController: mediaController
         )
     }
 
@@ -121,5 +151,33 @@ extension Harness {
     /// Turns the volume to an arbitrary unmuted level.
     func changeVolume() {
         levels.send(.volume(level: 0.5, isMuted: false))
+    }
+}
+
+extension NowPlaying {
+    static let song = NowPlaying(
+        app: "com.example.player",
+        title: "Windowlicker",
+        artist: "Aphex Twin",
+        artwork: Data([0xFF, 0xD8]),
+        duration: 367,
+        elapsed: 42,
+        elapsedAt: Date(timeIntervalSince1970: 1_000_000),
+        isPlaying: true
+    )
+
+    var paused: NowPlaying {
+        var copy = self
+        copy.isPlaying = false
+        return copy
+    }
+
+    /// The same track as its app sometimes publishes it: no artwork, and some other title.
+    var sparse: NowPlaying {
+        var copy = self
+        copy.artwork = nil
+        copy.title = "Player – Search"
+        copy.artist = ""
+        return copy
     }
 }

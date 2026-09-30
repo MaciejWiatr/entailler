@@ -35,3 +35,17 @@ public protocol FullscreenDetector: AnyObject {
 public protocol LevelChangeSource: AnyObject {
     func start(_ update: @escaping @MainActor (LevelChange) -> Void)
 }
+
+/// Reports what the system's now-playing source is playing.
+@MainActor
+public protocol NowPlayingSource: AnyObject {
+    /// Reports the current media as soon as it is known, then again whenever it changes.
+    /// `nil` means nothing is playing or the source is unavailable.
+    func start(_ update: @escaping @MainActor (NowPlaying?) -> Void)
+}
+
+/// Carries media commands to the system's now-playing source.
+@MainActor
+public protocol MediaController: AnyObject {
+    func send(_ command: MediaCommand)
+}

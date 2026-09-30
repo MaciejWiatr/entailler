@@ -2,7 +2,15 @@ import NotchCore
 import SwiftUI
 
 enum NookLayout {
-    static let size = CGSize(width: 640, height: 180)
+    static let width: CGFloat = 640
+    /// Room between the view switcher and the Widgets, and below the Widgets.
+    static let contentTopPadding: CGFloat = 8
+    static let contentBottomPadding: CGFloat = 22
+
+    /// The open Nook: the view switcher, as tall as the Notch, over a row of Widgets.
+    static func size(around placement: NotchPlacement) -> CGSize {
+        CGSize(width: width, height: placement.height + contentTopPadding + MediaWidgetView.height + contentBottomPadding)
+    }
     /// How close the pointer has to come to the collapsed Notch to count as resting on it:
     /// this far out on each side, and this far below it.
     static let hoverProximity = CGSize(width: 24, height: 16)
@@ -34,7 +42,12 @@ struct NotchView: View {
 
     var body: some View {
         if case .present(let placement) = core.state.visibility {
-            NotchSurface(state: core.state, placement: placement, switchNook: { core.switchNook(to: $0) })
+            NotchSurface(
+                state: core.state,
+                placement: placement,
+                switchNook: { core.switchNook(to: $0) },
+                sendMediaCommand: { core.sendMediaCommand($0) }
+            )
         }
     }
 }
@@ -43,6 +56,7 @@ private struct NotchSurface: View {
     let state: NotchDisplayState
     let placement: NotchPlacement
     let switchNook: (NookView) -> Void
+    let sendMediaCommand: (MediaCommand) -> Void
 
     private var notchHeight: CGFloat { placement.height }
 
@@ -71,7 +85,7 @@ private struct NotchSurface: View {
         switch state.nook {
         case .closed:
             if let activity = state.activity {
-                ActivityWings(activity: activity, placement: placement)
+                ActivityWings(activity: activity, media: state.media, placement: placement)
             }
         case .open(let view):
             VStack(spacing: 0) {
@@ -79,7 +93,19 @@ private struct NotchSurface: View {
                     .frame(height: notchHeight)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, NookLayout.openFlareRadius + 20)
-                Spacer()
+                switch view {
+                case .home:
+                    HStack {
+                        MediaWidgetView(media: state.media, send: sendMediaCommand)
+                            .frame(width: 320)
+                        Spacer()
+                    }
+                    .padding(.horizontal, NookLayout.openFlareRadius + 20)
+                    .padding(.top, NookLayout.contentTopPadding)
+                    .padding(.bottom, NookLayout.contentBottomPadding)
+                case .files:
+                    Spacer()
+                }
             }
             .transition(.opacity)
         }
@@ -88,7 +114,7 @@ private struct NotchSurface: View {
     private var size: CGSize {
         switch state.nook {
         case .open:
-            NookLayout.size
+            NookLayout.size(around: placement)
         case .closed:
             NookLayout.closedSize(around: placement, activity: state.activity)
         }
@@ -126,9 +152,11 @@ private struct ViewSwitcher: View {
     }
 }
 
-/// An Activity's content, split into a wing on each side of the camera.
+/// An Activity's content, split into a wing on each side of the camera. Now playing shows its
+/// artwork on the left and a waveform on the right.
 private struct ActivityWings: View {
     let activity: Activity
+    let media: MediaWidget
     let placement: NotchPlacement
 
     private var notchHeight: CGFloat { placement.height }
@@ -150,20 +178,28 @@ private struct ActivityWings: View {
             FlashSymbol(change: change)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.leading, notchHeight / 3)
-        // Stand-ins until each Ongoing Activity's feature ticket gives it real content.
+        case .nowPlaying:
+            NowPlayingArtwork(artwork: track?.artwork, isPlaying: isPlaying, size: notchHeight - 10)
+        // A stand-in until the upcoming-event feature ticket gives it real content.
         case .upcomingEvent:
             placeholder("calendar")
-        case .nowPlaying:
-            placeholder("music.note")
         }
     }
 
     @ViewBuilder private var trailing: some View {
-        if case .flash(let change) = activity {
+        switch activity {
+        case .flash(let change):
             LevelBar(change: change)
                 .padding(.horizontal, notchHeight / 3)
+        case .nowPlaying:
+            Waveform(isPlaying: isPlaying, height: notchHeight * 0.4)
+        case .upcomingEvent:
+            EmptyView()
         }
     }
+
+    private var track: NowPlaying? { media.nowPlaying }
+    private var isPlaying: Bool { track?.isPlaying ?? false }
 
     private func placeholder(_ symbol: String) -> some View {
         Image(systemName: symbol)
