@@ -1,1 +1,0 @@
-{"main_library":{"exported_symbols":[{"text":{"global":["_entailler_media_remote_main"]}}],"flags":[{"attributes":["not_app_extension_safe"]}],"install_names":[{"name":"/usr/local/lib/EntaillerMediaRemote.dylib"}],"target_info":[{"min_deployment":"26","target":"arm64-macos"}]},"tapi_tbd_version":5}

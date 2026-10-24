@@ -1,6 +1,8 @@
 # Entailler
 
-A personal macOS app that turns the MacBook's camera notch into an interactive surface for glanceable status, media, calendar, to-dos, and short-lived file handling.
+**The most elegant, slickest notch on macOS.**
+
+A personal macOS app that turns the MacBook's camera notch into an interactive surface for glanceable status, media, calendar, to-dos, and short-lived file handling. Every surface springs out of the camera cutout and tucks back in, content stays clipped to the Notch's shape, and the whole thing stays out of your way until it has something to say.
 
 ![The Nook open on Home, with the Media Widget and the Calendar Widget](docs/images/nook-home.png)
 

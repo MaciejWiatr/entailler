@@ -6,3 +6,6 @@
 .swiftpm/
 DerivedData/
 xcuserdata/
+
+# Xcode build output
+build/
