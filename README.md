@@ -1,6 +1,8 @@
+![Entailler: le notch le plus élégant](docs/images/hero.png)
+
 # Entailler
 
-**The most elegant, slickest notch on macOS.**
+**The most elegant, slickest notch on macOS.** [Download the latest release](https://github.com/MaciejWiatr/entailler/releases/latest).
 
 A personal macOS app that turns the MacBook's camera notch into an interactive surface for glanceable status, media, calendar, to-dos, and short-lived file handling. Every surface springs out of the camera cutout and tucks back in, content stays clipped to the Notch's shape, and the whole thing stays out of your way until it has something to say.
 
