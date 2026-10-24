@@ -3,6 +3,7 @@
 public enum ActivitySource: Sendable, CaseIterable {
     case flash
     case upcomingEvent
+    case claudeCode
     case nowPlaying
 }
 
@@ -17,12 +18,16 @@ public enum Activity: Equatable, Sendable {
     case flash(LevelChange)
     /// An Ongoing Activity counting down to an event that starts within 5 minutes.
     case upcomingEvent(CalendarEvent)
+    /// An Ongoing Activity for the Claude Code session that most recently began waiting for the
+    /// user, while it waits. `waiting` counts every session waiting, this one included.
+    case claudeCode(ClaudeSession, waiting: Int)
     case nowPlaying
 
     public var source: ActivitySource {
         switch self {
         case .flash: .flash
         case .upcomingEvent: .upcomingEvent
+        case .claudeCode: .claudeCode
         case .nowPlaying: .nowPlaying
         }
     }

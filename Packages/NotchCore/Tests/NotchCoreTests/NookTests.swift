@@ -69,4 +69,15 @@ struct NookTests {
 
         #expect(harness.state.nook == .open(.home))
     }
+
+    @Test func theNookCanSwitchToCalendarAndBack() {
+        let harness = Harness()
+        harness.hover(for: .milliseconds(150))
+
+        harness.core.switchNook(to: .calendar)
+        #expect(harness.state.nook == .open(.calendar))
+
+        harness.core.switchNook(to: .home)
+        #expect(harness.state.nook == .open(.home))
+    }
 }

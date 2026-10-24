@@ -1,0 +1,4 @@
+module NotchCore {
+header "NotchCore-Swift.h"
+export *
+}

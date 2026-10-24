@@ -142,6 +142,135 @@ final class FakeCalendarSource: CalendarSource {
     }
 }
 
+@MainActor
+final class FakeFrontAppSource: FrontAppSource {
+    private var update: (@MainActor (Int32?) -> Void)?
+    private var app: Int32?
+
+    func start(_ update: @escaping @MainActor (Int32?) -> Void) {
+        self.update = update
+        update(app)
+    }
+
+    func set(_ app: Int32?) {
+        self.app = app
+        update?(app)
+    }
+}
+
+@MainActor
+final class FakeClaudeCodeSource: ClaudeCodeSource {
+    private var update: (@MainActor (ClaudeCodeReport) -> Void)?
+    private(set) var broughtToFront: [ClaudeSession] = []
+
+    func start(_ update: @escaping @MainActor (ClaudeCodeReport) -> Void) {
+        self.update = update
+    }
+
+    func bringToFront(_ session: ClaudeSession) {
+        broughtToFront.append(session)
+    }
+
+    func send(_ report: ClaudeCodeReport) {
+        update?(report)
+    }
+}
+
+/// Reminders as a list in memory: ticking a to-do off takes it out of what's reported, as
+/// Reminders reports only to-dos not yet done.
+@MainActor
+final class FakeToDoSource: ToDoSource {
+    private var update: (@MainActor ([ToDo]?) -> Void)?
+    private var toDos: [ToDo] = []
+    private var hasAccess = true
+    private(set) var added: [QuickAdd] = []
+    private(set) var changes: [(id: String, isDone: Bool)] = []
+
+    func start(_ update: @escaping @MainActor ([ToDo]?) -> Void) {
+        self.update = update
+        report()
+    }
+
+    func add(_ title: String, due: Date?, isDueAtTime: Bool) {
+        added.append(QuickAdd(title: title, due: due, isDueAtTime: isDueAtTime))
+    }
+
+    func setDone(_ id: String, _ isDone: Bool) {
+        changes.append((id, isDone))
+    }
+
+    func set(_ toDos: [ToDo]) {
+        self.toDos = toDos
+        report()
+    }
+
+    func set(access: Bool) {
+        hasAccess = access
+        report()
+    }
+
+    private func report() {
+        update?(hasAccess ? toDos.filter { !$0.isDone } : nil)
+    }
+}
+
+/// Finds only the phrases it's been told about, at their last place in the text.
+@MainActor
+final class FakeDateDetector: DateDetector {
+    private var phrases: [String: (date: Date, hasTime: Bool)] = [:]
+
+    func teach(_ phrase: String, _ date: Date, hasTime: Bool) {
+        phrases[phrase] = (date, hasTime)
+    }
+
+    func lastDate(in text: String) -> WrittenDate? {
+        phrases.compactMap { phrase, meaning in
+            text.range(of: phrase, options: .backwards).map { WrittenDate(range: $0, date: meaning.date, hasTime: meaning.hasTime) }
+        }
+        .max { $0.range.lowerBound < $1.range.lowerBound }
+    }
+}
+
+/// Remembers what was saved, as if across a restart, and knows which files were deleted or moved.
+@MainActor
+final class FakeTrayStore: TrayStore {
+    private(set) var saved: [URL]
+    private var gone: Set<URL> = []
+    private var moves: [URL: URL] = [:]
+
+    init(saved: [URL] = []) {
+        self.saved = saved
+    }
+
+    func load() -> [URL] { saved }
+
+    func save(_ files: [URL]) {
+        saved = files
+    }
+
+    func locate(_ file: URL) -> URL? {
+        let now = moves[file] ?? file
+        return gone.contains(now) ? nil : now
+    }
+
+    func delete(_ file: URL) {
+        gone.insert(file)
+    }
+
+    func move(_ file: URL, to destination: URL) {
+        moves[file] = destination
+    }
+}
+
+@MainActor
+final class FakeAirDropSharer: AirDropSharer {
+    private(set) var shared: [[URL]] = []
+
+    func share(_ files: [URL]) {
+        shared.append(files)
+    }
+}
+
 extension NotchPlacement {
     static let macBookPro = NotchPlacement(x: 1545, y: 1085, width: 185, height: 32)
 }
@@ -156,10 +285,17 @@ struct Harness {
     let nowPlaying = FakeNowPlayingSource()
     let mediaController = FakeMediaController()
     let calendar = FakeCalendarSource()
+    let frontApp = FakeFrontAppSource()
+    let claudeCode = FakeClaudeCodeSource()
+    let toDos = FakeToDoSource()
+    let dates = FakeDateDetector()
+    let trayStore: FakeTrayStore
+    let airDrop = FakeAirDropSharer()
     let core: NotchCore
 
-    init(placement: NotchPlacement? = .macBookPro) {
+    init(placement: NotchPlacement? = .macBookPro, trayStore: FakeTrayStore = FakeTrayStore()) {
         display = FakeDisplayLocator(placement: placement)
+        self.trayStore = trayStore
         core = NotchCore(
             clock: clock,
             displayLocator: display,
@@ -167,7 +303,13 @@ struct Harness {
             levelChangeSource: levels,
             nowPlayingSource: nowPlaying,
             mediaController: mediaController,
-            calendarSource: calendar
+            calendarSource: calendar,
+            frontAppSource: frontApp,
+            claudeCodeSource: claudeCode,
+            toDoSource: toDos,
+            dateDetector: dates,
+            trayStore: trayStore,
+            airDropSharer: airDrop
         )
     }
 
@@ -224,7 +366,13 @@ extension Date {
     }
 
     static func tomorrow(at hour: Int, _ minute: Int = 0) -> Date {
-        Calendar.current.date(bySettingHour: hour, minute: minute, second: 0, of: tomorrow)!
+        day(1, at: hour, minute)
+    }
+
+    /// A time on the day this many days from today.
+    static func day(_ offset: Int, at hour: Int, _ minute: Int = 0) -> Date {
+        let day = Calendar.current.date(byAdding: .day, value: offset, to: today)!
+        return Calendar.current.date(bySettingHour: hour, minute: minute, second: 0, of: day)!
     }
 }
 
@@ -245,5 +393,25 @@ extension CalendarEvent {
             end: Calendar.current.date(byAdding: .day, value: 1, to: day)!,
             isAllDay: true
         )
+    }
+}
+
+extension ClaudeHost {
+    /// A terminal app, and the browser the user switches to while Claude works.
+    static let terminal = ClaudeHost(app: 501, terminal: "/dev/ttys003")
+    static let browserApp: Int32 = 777
+}
+
+extension ClaudeSession {
+    /// A session in the terminal app that finished responding.
+    static func finished(_ id: String, project: String = "entailler", host: ClaudeHost? = .terminal) -> ClaudeSession {
+        ClaudeSession(id: id, project: project, reason: .finished, host: host)
+    }
+}
+
+extension URL {
+    /// A file in the user's Downloads folder.
+    static func file(_ name: String) -> URL {
+        URL(filePath: "/Users/me/Downloads/\(name)")
     }
 }

@@ -12,7 +12,7 @@ struct CalendarWidgetTests {
 
         harness.calendar.set([review, standup, breakfast])
 
-        #expect(harness.agenda?.today == [standup, review])
+        #expect(harness.day(0)?.events == [standup, review])
     }
 
     @Test func anEventUnderwayIsStillListedUntilItEnds() {
@@ -20,10 +20,10 @@ struct CalendarWidgetTests {
         let standup = CalendarEvent.meeting("Standup", at: .today(at: 8, 45))
 
         harness.calendar.set([standup])
-        #expect(harness.agenda?.today == [standup])
+        #expect(harness.day(0)?.events == [standup])
 
         harness.clock.advance(by: .seconds(15 * 60))
-        #expect(harness.agenda?.today == [])
+        #expect(harness.day(0)?.events == [])
     }
 
     @Test func todaysAllDayEventsAreOnTheAllDayLineAndNotAmongTheTimedOnes() {
@@ -33,31 +33,73 @@ struct CalendarWidgetTests {
 
         harness.calendar.set([standup, holiday])
 
-        #expect(harness.agenda?.allDay == [holiday])
-        #expect(harness.agenda?.today == [standup])
+        #expect(harness.day(0)?.allDay == [holiday])
+        #expect(harness.day(0)?.events == [standup])
     }
 
-    @Test func tomorrowsFirstEventIsShownAfterTodays() {
+    @Test func theDaysStartWithTodayAndFollowOneAnother() {
+        let harness = Harness()
+
+        #expect(harness.day(0)?.date == .today)
+        #expect(harness.day(1)?.date == .tomorrow)
+    }
+
+    @Test func eachDayAfterTodayListsAllItsEventsAndItsAllDayLine() {
         let harness = Harness()
         let lunch = CalendarEvent.meeting("Lunch", at: .tomorrow(at: 12))
         let planning = CalendarEvent.meeting("Planning", at: .tomorrow(at: 9))
+        let holiday = CalendarEvent.allDay("Holiday", on: .tomorrow)
         let standup = CalendarEvent.meeting("Standup", at: .today(at: 10))
 
-        harness.calendar.set([lunch, planning, standup])
+        harness.calendar.set([lunch, planning, holiday, standup])
 
-        #expect(harness.agenda?.today == [standup])
-        #expect(harness.agenda?.tomorrow == planning)
+        #expect(harness.day(0)?.events == [standup])
+        #expect(harness.day(0)?.allDay == [])
+        #expect(harness.day(1)?.events == [planning, lunch])
+        #expect(harness.day(1)?.allDay == [holiday])
     }
 
-    @Test func tomorrowsAllDayEventsAreNotShown() {
+    @Test func aWeekOfDaysIsShownAtFirst() {
         let harness = Harness()
-        let holiday = CalendarEvent.allDay("Holiday", on: .tomorrow)
-        let planning = CalendarEvent.meeting("Planning", at: .tomorrow(at: 9))
+        let nextWeek = CalendarEvent.meeting("Retro", at: .day(6, at: 10))
+        let later = CalendarEvent.meeting("Offsite", at: .day(7, at: 10))
 
-        harness.calendar.set([holiday, planning])
+        harness.calendar.set([nextWeek, later])
 
-        #expect(harness.agenda?.allDay == [])
-        #expect(harness.agenda?.tomorrow == planning)
+        #expect(harness.days.count == 7)
+        #expect(harness.day(6)?.events == [nextWeek])
+    }
+
+    @Test func showingTheLastDaysBringsInTheWeekAfter() {
+        let harness = Harness()
+        let later = CalendarEvent.meeting("Offsite", at: .day(10, at: 10))
+        harness.calendar.set([later])
+        harness.hover(for: .milliseconds(150))
+
+        harness.core.calendarDayShown(6)
+
+        #expect(harness.days.count == 13)
+        #expect(harness.day(10)?.events == [later])
+    }
+
+    @Test func closingTheNookGoesBackToAWeekOfDays() {
+        let harness = Harness()
+        harness.hover(for: .milliseconds(150))
+        harness.core.calendarDayShown(6)
+
+        harness.core.pointerExited()
+
+        #expect(harness.days.count == 7)
+    }
+
+    @Test func aMultiDayAllDayEventIsOnTheAllDayLineOfEachDayItCovers() {
+        let harness = Harness()
+        var trip = CalendarEvent.allDay("Trip", on: .today)
+        trip.end = Date.day(3, at: 0)
+
+        harness.calendar.set([trip])
+
+        #expect(harness.days.prefix(4).map(\.allDay) == [[trip], [trip], [trip], []])
     }
 
     @Test func theCalendarWidgetUpdatesWhenEventsChange() {
@@ -70,23 +112,22 @@ struct CalendarWidgetTests {
 
         harness.calendar.set([moved])
 
-        #expect(harness.agenda?.today == [moved])
+        #expect(harness.day(0)?.events == [moved])
     }
 
-    @Test func atMidnightTomorrowsEventsBecomeTodaysAndTheAllDayLineMovesOn() {
+    @Test func atMidnightTomorrowBecomesToday() {
         let harness = Harness()
         let review = CalendarEvent.meeting("Review", at: .today(at: 15))
         let today = CalendarEvent.allDay("Holiday", on: .today)
         let tomorrow = CalendarEvent.allDay("Out of office", on: .tomorrow)
         let planning = CalendarEvent.meeting("Planning", at: .tomorrow(at: 9))
-        let lunch = CalendarEvent.meeting("Lunch", at: .tomorrow(at: 12))
-        let dayAfter = Calendar.current.date(byAdding: .day, value: 1, to: .tomorrow)!
-        let retro = CalendarEvent.meeting("Retro", at: dayAfter + 10 * 3600)
-        harness.calendar.set([review, today, tomorrow, planning, lunch, retro])
+        let retro = CalendarEvent.meeting("Retro", at: .day(2, at: 10))
+        harness.calendar.set([review, today, tomorrow, planning, retro])
 
         harness.clock.advance(by: .seconds(15 * 3600))
 
-        #expect(harness.agenda == CalendarAgenda(allDay: [tomorrow], today: [planning, lunch], tomorrow: retro))
+        #expect(harness.day(0) == CalendarDay(date: .tomorrow, allDay: [tomorrow], events: [planning]))
+        #expect(harness.day(1)?.events == [retro])
     }
 
     @Test func whenCalendarAccessIsDeniedTheCalendarWidgetSaysSo() {
@@ -106,14 +147,19 @@ struct CalendarWidgetTests {
 
         harness.calendar.set(.granted)
 
-        #expect(harness.agenda?.today == [standup])
+        #expect(harness.day(0)?.events == [standup])
     }
 }
 
 extension Harness {
-    /// What the Calendar Widget lists, or `nil` if it says calendar access was denied.
-    var agenda: CalendarAgenda? {
-        guard case .agenda(let agenda) = state.calendar else { return nil }
-        return agenda
+    /// The days the Calendar Widget shows, or none if it says calendar access was denied.
+    var days: [CalendarDay] {
+        guard case .days(let days) = state.calendar else { return [] }
+        return days
+    }
+
+    /// The Calendar Widget's day this many days from today.
+    func day(_ index: Int) -> CalendarDay? {
+        days.indices.contains(index) ? days[index] : nil
     }
 }

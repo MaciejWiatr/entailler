@@ -43,28 +43,41 @@ public enum CalendarAccess: Equatable, Sendable {
 public enum CalendarWidget: Equatable, Sendable {
     /// Calendar access was denied, so there are no events to show.
     case accessDenied
-    case agenda(CalendarAgenda)
+    /// Days from today on, one after another.
+    case days([CalendarDay])
 }
 
-/// The events the Calendar Widget lists, in the order it lists them.
-public struct CalendarAgenda: Equatable, Sendable {
-    /// Today's all-day events, shown together on one line at the top.
+/// One day in the Calendar Widget.
+public struct CalendarDay: Hashable, Sendable {
+    /// The start of the day.
+    public var date: Date
+    /// The day's all-day events, shown together on one line at the top.
     public var allDay: [CalendarEvent]
-    /// Today's events that haven't ended yet, earliest first.
-    public var today: [CalendarEvent]
-    /// Tomorrow's first event that isn't all-day.
-    public var tomorrow: CalendarEvent?
+    /// The day's other events, earliest first. Today's leave out those that have ended.
+    public var events: [CalendarEvent]
 
-    public init(allDay: [CalendarEvent] = [], today: [CalendarEvent] = [], tomorrow: CalendarEvent? = nil) {
+    public init(date: Date, allDay: [CalendarEvent] = [], events: [CalendarEvent] = []) {
+        self.date = date
         self.allDay = allDay
-        self.today = today
-        self.tomorrow = tomorrow
+        self.events = events
     }
-
-    public static let empty = CalendarAgenda()
 }
 
-/// The days the Calendar Widget covers, as seen at one moment.
+/// A month of days, shown as a grid in the Nook's Calendar view.
+public struct CalendarMonth: Equatable, Sendable {
+    /// The first day of the month.
+    public var month: Date
+    /// Every day of the month, first to last, each with all its events.
+    public var days: [CalendarDay]
+    /// The start of the day whose events show beside the grid.
+    public var selected: Date
+    /// The start of today, which the grid marks.
+    public var today: Date
+
+    public var selectedDay: CalendarDay? { days.first { $0.date == selected } }
+}
+
+/// The days the Calendar Widget covers, from today on, as seen at one moment.
 struct CalendarDays {
     /// How long before an event starts the upcoming-event Activity shows.
     static let upcomingEventLead: TimeInterval = 5 * 60
@@ -72,25 +85,34 @@ struct CalendarDays {
     let now: Date
     let today: Date
     let tomorrow: Date
-    let dayAfterTomorrow: Date
+    /// The start of each day covered, from today on.
+    let dates: [Date]
+    private let end: Date
 
-    init(at now: Date, calendar: Calendar = .current) {
+    init(at now: Date, count: Int, calendar: Calendar = .current) {
+        let today = calendar.startOfDay(for: now)
+        let day = { (offset: Int) in calendar.date(byAdding: .day, value: offset, to: today)! }
         self.now = now
-        today = calendar.startOfDay(for: now)
-        tomorrow = calendar.date(byAdding: .day, value: 1, to: today)!
-        dayAfterTomorrow = calendar.date(byAdding: .day, value: 2, to: today)!
+        self.today = today
+        tomorrow = day(1)
+        dates = (0..<count).map(day)
+        end = day(count)
     }
 
-    /// Today and tomorrow, the span the Calendar Widget reads events from.
-    var interval: DateInterval { DateInterval(start: today, end: dayAfterTomorrow) }
+    /// The span the Calendar Widget reads events from.
+    var interval: DateInterval { DateInterval(start: today, end: end) }
 
-    func agenda(of events: [CalendarEvent]) -> CalendarAgenda {
-        let timed = events.filter { !$0.isAllDay }.sorted { $0.start < $1.start }
-        return CalendarAgenda(
-            allDay: events.filter { $0.isAllDay && $0.start < tomorrow && $0.end > today },
-            today: timed.filter { $0.start < tomorrow && $0.end > now },
-            tomorrow: timed.first { $0.start >= tomorrow }
-        )
+    /// Each day's events. Today leaves out those that have ended, and also lists those that began
+    /// before it and are still going. An all-day event is on every day it covers.
+    func days(of events: [CalendarEvent]) -> [CalendarDay] {
+        let events = events.sorted { $0.start < $1.start }
+        return zip(dates, dates.dropFirst() + [end]).map { start, next in
+            var day = calendarDay(from: start, to: next, of: events)
+            if start == today {
+                day.events = events.filter { !$0.isAllDay && $0.start < next && $0.end > now }
+            }
+            return day
+        }
     }
 
     /// The soonest event starting within the next 5 minutes. All-day events never count.
@@ -108,11 +130,57 @@ struct CalendarDays {
     }
 }
 
+extension CalendarMonth {
+    /// The month this many months after the one `now` falls in.
+    static func span(offset: Int, from now: Date, calendar: Calendar = .current) -> DateInterval {
+        let thisMonth = calendar.dateInterval(of: .month, for: now)!.start
+        return calendar.dateInterval(of: .month, for: calendar.date(byAdding: .month, value: offset, to: thisMonth)!)!
+    }
+
+    /// The month spanning `span`. The selected day is `selected` if it falls in the month, or else
+    /// today if the month is this one, or else the month's first day.
+    init(span: DateInterval, events: [CalendarEvent], selected: Date?, now: Date, calendar: Calendar = .current) {
+        let isInMonth = { (date: Date) in date >= span.start && date < span.end }
+        let dates = Array(sequence(first: span.start) { calendar.date(byAdding: .day, value: 1, to: $0)! }.prefix { isInMonth($0) })
+        let events = events.sorted { $0.start < $1.start }
+        let today = calendar.startOfDay(for: now)
+        self.init(
+            month: span.start,
+            days: zip(dates, dates.dropFirst() + [span.end]).map { calendarDay(from: $0, to: $1, of: events) },
+            selected: selected.flatMap { isInMonth($0) ? calendar.startOfDay(for: $0) : nil }
+                ?? (isInMonth(today) ? today : span.start),
+            today: today
+        )
+    }
+}
+
+/// The day from `start` until `next`: the all-day events covering it, and the other events that
+/// start in it, in the order given.
+private func calendarDay(from start: Date, to next: Date, of events: [CalendarEvent]) -> CalendarDay {
+    CalendarDay(
+        date: start,
+        allDay: events.filter { $0.isAllDay && $0.start < next && $0.end > start },
+        events: events.filter { !$0.isAllDay && $0.start >= start && $0.start < next }
+    )
+}
+
 extension CalendarEvent {
     /// The Zoom, Google Meet, Microsoft Teams or FaceTime link to join the event with, if it has one.
     /// It's looked for in the event's URL, then its location, then its notes, and the first one wins.
     public var joinLink: URL? {
         [url?.absoluteString, location, notes].lazy.compactMap { $0.flatMap(meetingLink(in:)) }.first
+    }
+
+    /// What the Join button opens: the meeting link, except that a Google Meet link goes through
+    /// Google's account chooser first, so the user picks which Google account joins.
+    public var joinURL: URL? {
+        guard let link = joinLink else { return nil }
+        guard link.host() == "meet.google.com" else { return link }
+        // The link's own query stays with it rather than being read as the chooser's.
+        var allowed = CharacterSet.urlQueryAllowed
+        allowed.remove(charactersIn: "&=+")
+        let meeting = link.absoluteString.addingPercentEncoding(withAllowedCharacters: allowed)!
+        return URL(string: "https://accounts.google.com/AccountChooser?continue=\(meeting)")
     }
 }
 

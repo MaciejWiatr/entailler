@@ -52,7 +52,7 @@ struct UpcomingEventActivityTests {
 
         harness.clock.advance(by: .seconds(60))
         #expect(harness.state.activity == nil)
-        #expect(harness.agenda?.allDay == [holiday])
+        #expect(harness.day(0)?.allDay == [holiday])
     }
 
     @Test func ofTwoEventsAboutToStartTheSoonerOneIsShown() {

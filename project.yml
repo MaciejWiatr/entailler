@@ -33,7 +33,12 @@ targets:
         INFOPLIST_KEY_LSUIElement: YES
         INFOPLIST_KEY_CFBundleDisplayName: Entailler
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.utilities
+        # Xcode drops INFOPLIST_KEY_NSAudioCaptureUsageDescription, so the System Audio Recording
+        # prompt's text comes from a partial Info.plist merged into the generated one.
+        INFOPLIST_FILE: Entailler/Info.plist
         INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription: Entailler shows your upcoming events in the Notch and lets you join their calls.
+        INFOPLIST_KEY_NSRemindersFullAccessUsageDescription: Entailler shows your to-dos from Reminders in the Notch and lets you tick them off and add new ones.
+        INFOPLIST_KEY_NSAppleEventsUsageDescription: Entailler selects the Terminal or iTerm2 tab a Claude Code session runs in when you open it from the Notch.
         # A stable signing identity keeps the Accessibility grant, which the volume and
         # brightness keys need, across rebuilds. Ad-hoc signatures change with every build.
         CODE_SIGN_STYLE: Manual

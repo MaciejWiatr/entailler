@@ -1,0 +1,109 @@
+{
+  "" : {
+    "diagnostics" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/NotchCore-primary.dia",
+    "emit-module-dependencies" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/NotchCore-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/NotchCore-primary-emit-module.dia",
+    "pch" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/NotchCore-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/NotchCore-primary.swiftdeps"
+  },
+  "/Users/maciejwiatr/Apps/entailler/Packages/NotchCore/Sources/NotchCore/Activity.swift" : {
+    "const-values" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Activity.swiftconstvalues",
+    "dependencies" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Activity.d",
+    "diagnostics" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Activity.dia",
+    "index-unit-output-path" : "/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Activity.o",
+    "llvm-bc" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Activity.bc",
+    "object" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Activity.o",
+    "swift-dependencies" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Activity.swiftdeps",
+    "swiftmodule" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Activity~partial.swiftmodule"
+  },
+  "/Users/maciejwiatr/Apps/entailler/Packages/NotchCore/Sources/NotchCore/Adapters.swift" : {
+    "const-values" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Adapters.swiftconstvalues",
+    "dependencies" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Adapters.d",
+    "diagnostics" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Adapters.dia",
+    "index-unit-output-path" : "/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Adapters.o",
+    "llvm-bc" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Adapters.bc",
+    "object" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Adapters.o",
+    "swift-dependencies" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Adapters.swiftdeps",
+    "swiftmodule" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Adapters~partial.swiftmodule"
+  },
+  "/Users/maciejwiatr/Apps/entailler/Packages/NotchCore/Sources/NotchCore/Calendar.swift" : {
+    "const-values" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Calendar.swiftconstvalues",
+    "dependencies" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Calendar.d",
+    "diagnostics" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Calendar.dia",
+    "index-unit-output-path" : "/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Calendar.o",
+    "llvm-bc" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Calendar.bc",
+    "object" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Calendar.o",
+    "swift-dependencies" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Calendar.swiftdeps",
+    "swiftmodule" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Calendar~partial.swiftmodule"
+  },
+  "/Users/maciejwiatr/Apps/entailler/Packages/NotchCore/Sources/NotchCore/ClaudeCode.swift" : {
+    "const-values" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/ClaudeCode.swiftconstvalues",
+    "dependencies" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/ClaudeCode.d",
+    "diagnostics" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/ClaudeCode.dia",
+    "index-unit-output-path" : "/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/ClaudeCode.o",
+    "llvm-bc" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/ClaudeCode.bc",
+    "object" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/ClaudeCode.o",
+    "swift-dependencies" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/ClaudeCode.swiftdeps",
+    "swiftmodule" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/ClaudeCode~partial.swiftmodule"
+  },
+  "/Users/maciejwiatr/Apps/entailler/Packages/NotchCore/Sources/NotchCore/Clock.swift" : {
+    "const-values" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Clock.swiftconstvalues",
+    "dependencies" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Clock.d",
+    "diagnostics" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Clock.dia",
+    "index-unit-output-path" : "/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Clock.o",
+    "llvm-bc" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Clock.bc",
+    "object" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Clock.o",
+    "swift-dependencies" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Clock.swiftdeps",
+    "swiftmodule" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Clock~partial.swiftmodule"
+  },
+  "/Users/maciejwiatr/Apps/entailler/Packages/NotchCore/Sources/NotchCore/DisplayState.swift" : {
+    "const-values" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/DisplayState.swiftconstvalues",
+    "dependencies" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/DisplayState.d",
+    "diagnostics" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/DisplayState.dia",
+    "index-unit-output-path" : "/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/DisplayState.o",
+    "llvm-bc" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/DisplayState.bc",
+    "object" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/DisplayState.o",
+    "swift-dependencies" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/DisplayState.swiftdeps",
+    "swiftmodule" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/DisplayState~partial.swiftmodule"
+  },
+  "/Users/maciejwiatr/Apps/entailler/Packages/NotchCore/Sources/NotchCore/Media.swift" : {
+    "const-values" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Media.swiftconstvalues",
+    "dependencies" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Media.d",
+    "diagnostics" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Media.dia",
+    "index-unit-output-path" : "/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Media.o",
+    "llvm-bc" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Media.bc",
+    "object" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Media.o",
+    "swift-dependencies" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Media.swiftdeps",
+    "swiftmodule" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Media~partial.swiftmodule"
+  },
+  "/Users/maciejwiatr/Apps/entailler/Packages/NotchCore/Sources/NotchCore/NotchCore.swift" : {
+    "const-values" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/NotchCore.swiftconstvalues",
+    "dependencies" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/NotchCore.d",
+    "diagnostics" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/NotchCore.dia",
+    "index-unit-output-path" : "/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/NotchCore.o",
+    "llvm-bc" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/NotchCore.bc",
+    "object" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/NotchCore.o",
+    "swift-dependencies" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/NotchCore.swiftdeps",
+    "swiftmodule" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/NotchCore~partial.swiftmodule"
+  },
+  "/Users/maciejwiatr/Apps/entailler/Packages/NotchCore/Sources/NotchCore/ToDo.swift" : {
+    "const-values" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/ToDo.swiftconstvalues",
+    "dependencies" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/ToDo.d",
+    "diagnostics" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/ToDo.dia",
+    "index-unit-output-path" : "/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/ToDo.o",
+    "llvm-bc" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/ToDo.bc",
+    "object" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/ToDo.o",
+    "swift-dependencies" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/ToDo.swiftdeps",
+    "swiftmodule" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/ToDo~partial.swiftmodule"
+  },
+  "/Users/maciejwiatr/Apps/entailler/Packages/NotchCore/Sources/NotchCore/Tray.swift" : {
+    "const-values" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Tray.swiftconstvalues",
+    "dependencies" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Tray.d",
+    "diagnostics" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Tray.dia",
+    "index-unit-output-path" : "/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Tray.o",
+    "llvm-bc" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Tray.bc",
+    "object" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Tray.o",
+    "swift-dependencies" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Tray.swiftdeps",
+    "swiftmodule" : "/Users/maciejwiatr/Apps/entailler/build/Build/Intermediates.noindex/NotchCore.build/Debug/NotchCore.build/Objects-normal/arm64/Tray~partial.swiftmodule"
+  }
+}

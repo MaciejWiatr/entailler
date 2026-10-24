@@ -1,0 +1,8 @@
+Target dependency graph (4 targets)
+Target 'Entailler' in project 'Entailler'
+➜ Explicit dependency on target 'EntaillerMediaRemote' in project 'Entailler'
+➜ Explicit dependency on target 'NotchCore' in project 'NotchCore'
+Target 'NotchCore' in project 'NotchCore'
+➜ Explicit dependency on target 'NotchCore' in project 'NotchCore'
+Target 'NotchCore' in project 'NotchCore' (no dependencies)
+Target 'EntaillerMediaRemote' in project 'Entailler' (no dependencies)

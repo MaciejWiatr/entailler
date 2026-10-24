@@ -89,6 +89,35 @@ struct MeetingLinkTests {
     }
 }
 
+struct JoinURLTests {
+    @Test func joiningAGoogleMeetCallFirstAsksWhichGoogleAccountToJoinFrom() {
+        let event = CalendarEvent.with(location: "https://meet.google.com/abc-defg-hij")
+
+        #expect(event.joinURL == URL(string: "https://accounts.google.com/AccountChooser?continue=https://meet.google.com/abc-defg-hij"))
+    }
+
+    @Test func aMeetLinkWithItsOwnQueryIsPassedOnWhole() {
+        let event = CalendarEvent.with(location: "https://meet.google.com/abc-defg-hij?hs=122&authuser=0")
+
+        #expect(event.joinURL == URL(string: "https://accounts.google.com/AccountChooser?continue=https://meet.google.com/abc-defg-hij?hs%3D122%26authuser%3D0"))
+    }
+
+    @Test(arguments: [
+        "https://zoom.us/j/111",
+        "https://teams.live.com/meet/222",
+        "https://facetime.apple.com/join#v=1&p=AbCdEf",
+    ])
+    func joiningAnyOtherCallOpensItsLinkDirectly(link: String) {
+        let event = CalendarEvent.with(location: link)
+
+        #expect(event.joinURL == URL(string: link))
+    }
+
+    @Test func anEventWithoutAMeetingLinkHasNothingToJoin() {
+        #expect(CalendarEvent.with(location: "Room 4").joinURL == nil)
+    }
+}
+
 extension CalendarEvent {
     static func with(url: URL? = nil, location: String? = nil, notes: String? = nil) -> CalendarEvent {
         CalendarEvent(

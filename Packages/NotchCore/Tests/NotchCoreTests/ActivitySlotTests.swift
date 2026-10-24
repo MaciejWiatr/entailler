@@ -31,14 +31,16 @@ struct ActivitySlotTests {
         [ActivitySource.nowPlaying, .upcomingEvent, .flash],
         [.flash, .upcomingEvent, .nowPlaying],
         [.upcomingEvent, .flash, .nowPlaying],
+        [.claudeCode, .flash, .nowPlaying],
     ])
-    func aFlashActivityWinsOverBothOngoingActivitiesWhateverTheOrder(order: [ActivitySource]) {
+    func aFlashActivityWinsOverEveryOngoingActivityWhateverTheOrder(order: [ActivitySource]) {
         let harness = Harness()
 
         for source in order {
             switch source {
             case .flash: harness.changeVolume()
             case .upcomingEvent: harness.core.activityStarted(.upcomingEvent(.standup))
+            case .claudeCode: harness.core.activityStarted(.claudeCode(.finished("a"), waiting: 1))
             case .nowPlaying: harness.core.activityStarted(.nowPlaying)
             }
         }

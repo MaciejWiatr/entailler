@@ -18,6 +18,14 @@ _Avoid_: Panel, popover, drawer
 The Nook view that holds the Widgets.
 _Avoid_: Main tab, dashboard
 
+**To-Dos**:
+The Nook view that holds the user's to-dos from Apple Reminders, kept in sync both ways.
+_Avoid_: Tasks, todo list, reminders tab
+
+**To-Do**:
+One reminder from Apple Reminders that isn't done yet, as shown in To-Dos.
+_Avoid_: Task, item, reminder
+
 **Files**:
 The Nook view that holds the Tray and the AirDrop Drop Zone.
 _Avoid_: Tray tab, shelf tab
